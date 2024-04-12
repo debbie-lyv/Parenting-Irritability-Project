@@ -27,48 +27,130 @@ summary(white)
 summary(black)
 summary(hispanic)
 
-summary(data$CBCLAVG_3)
+data$Race <- factor(data$MRaceT1)
+comparisons <- list(c("White", "Black"), c("White", "Hispanic"), c("Black","Hispanic"))
 
 ####### ANOVA T3 #########
 
-anova1 <- data %>% anova_test(CBCLAVG_3 ~ MRaceT1, type = 3)
-get_anova_table(anova1)
-anova2 <- data %>% anova_test(AGGAVGT3 ~ MRaceT1, type = 3)
-get_anova_table(anova2)
-anova3 <- data %>% anova_test(CONF1AVGT3 ~ MRaceT1, type = 3)
-get_anova_table(anova3)
-anova4 <- data %>% anova_test(CONF2AVGT3 ~ MRaceT1, type = 3)
-get_anova_table(anova4)
-anova5 <- data %>% anova_test(CONF3AVGT3 ~ MRaceT1, type = 3)
-get_anova_table(anova5)
-anova6 <- data %>% anova_test(CONF4AVGT3 ~ MRaceT1, type = 3)
-get_anova_table(anova6)
+# CBCLAVG_3
+CBCLAVG3_aov <- aov(CBCLAVG_3 ~ Race,
+                    data = data
+)
+summary(CBCLAVG3_aov)
 
-# CONF1AVGT3,CONF2AVGT3,CONF3AVGT3, CONF4AVGT3 significant
-
-compare_means(CONF1AVGT3 ~ MRaceT1, data = data, method = "anova", type = 3)
-compare_means(CONF2AVGT3 ~ MRaceT1, data = data, method = "anova", type = 3)
-compare_means(CONF3AVGT3 ~ MRaceT1, data = data, method = "anova", type = 3)
-compare_means(CONF4AVGT3 ~ MRaceT1, data = data, method = "anova", type = 3)
-
-## all significant 
-
-data$Race <- factor(data$MRaceT1)
-comparisons <- list(c("1", "2"), c("2", "3"), c("1","3"))
-
-ggboxplot(data, "Race", "CONF1AVGT3", ylab = "Non-vio disc Avg T3", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+# p < .01
+CBCLAVG3_phoc <- glht(CBCLAVG3_aov,
+                      linfct = mcp(Race = "Tukey")
+)
+summary(CBCLAVG3_phoc)
+plot(CBCLAVG3_phoc)
+# significant differences: hispanic - black
+ggboxplot(data, x = "Race", y = "CBCLAVG_3", ylab = "CBCL Avg T3", fill = "Race", color = "Black", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
   scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
   stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 1.5)
-ggboxplot(data, "Race", "CONF2AVGT3", ylab = "Psych Agg Avg T3", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
-  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
-  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 2)
-ggboxplot(data, "Race", "CONF3AVGT3", ylab = "Phys As Avg T3", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
-  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
-  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3.5)
-ggboxplot(data, "Race", "CONF4AVGT3", ylab = "Neglect T3", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
-  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
-  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3.5)
 
+
+
+# AGGAVGT3
+AGGAVGT3_aov <- aov(AGGAVGT3 ~ Race,
+                    data = data
+)
+summary(AGGAVGT3_aov)
+
+# p > .05, no significant differences
+ggboxplot(data, x = "Race", y = "AGGAVGT3", ylab = "Agg Avg T3", fill = "Race", color = "Black", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons, label = "p.signif") + stat_compare_means(label.y = 1.5)
+
+
+
+# CONF1AVGT3
+CONF1AVGT3_aov <- aov(CONF1AVGT3 ~ Race,
+                      data = data
+)
+summary(CONF1AVGT3_aov)
+
+# p < .0001
+CONF1AVGT3_phoc <- glht(CONF1AVGT3_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF1AVGT3_phoc)
+plot(CONF1AVGT3_phoc)
+# significant differences: white - black, white - hispanic, hispanic - black
+ggboxplot(data, x = "Race", y = "CONF1AVGT3", ylab = "Non-vio Avg T3", fill = "Race", color = "Black", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF2AVGT3
+CONF2AVGT3_aov <- aov(CONF2AVGT3 ~ Race,
+                      data = data
+)
+summary(CONF2AVGT3_aov)
+
+# p < .0001
+CONF2AVGT3_phoc <- glht(CONF2AVGT3_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF2AVGT3_phoc)
+plot(CONF2AVGT3_phoc)
+# significant differences: white - black, white - hispanic, hispanic - black
+ggboxplot(data, "Race", "CONF2AVGT3", ylab = "Psy Agg Avg T3", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF3AVGT3
+CONF3AVGT3_aov <- aov(CONF3AVGT3 ~ Race,
+                      data = data
+)
+summary(CONF3AVGT3_aov)
+
+# p < .0001
+CONF3AVGT3_phoc <- glht(CONF3AVGT3_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF3AVGT3_phoc)
+plot(CONF3AVGT3_phoc)
+# significant differences: white - black, white - hispanic, hispanic - black
+ggboxplot(data, "Race", "CONF3AVGT3", ylab = "Phy As Avg T3", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF4AVGT3
+CONF4AVGT3_aov <- aov(CONF4AVGT3 ~ Race,
+                      data = data
+)
+summary(CONF4AVGT3_aov)
+
+# p < .05
+CONF4AVGT3_phoc <- glht(CONF4AVGT3_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF4AVGT3_phoc)
+plot(CONF4AVGT3_phoc)
+# significant differences: white - black (white - hispanic p < 0.1)
+ggboxplot(data, "Race", "CONF4AVGT3", ylab = "Neg Avg T3", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 1.5)
+
+
+#### T3 Means and SDs ####
+
+group_by(data, MRaceT1) %>%
+  summarise(
+    mean = mean(CBCLAVG_3, na.rm = TRUE),
+    sd = sd(CBCLAVG_3, na.rm = TRUE)
+  )
+group_by(data, MRaceT1) %>%
+  summarise(
+    mean = mean(AGGAVGT3, na.rm = TRUE),
+    sd = sd(AGGAVGT3, na.rm = TRUE)
+  )
 group_by(data, MRaceT1) %>%
   summarise(
     mean = mean(CONF1AVGT3, na.rm = TRUE),
@@ -89,76 +171,248 @@ group_by(data, MRaceT1) %>%
     mean = mean(CONF4AVGT3, na.rm = TRUE),
     sd = sd(CONF4AVGT3, na.rm = TRUE)
   )
-##### ANOVA T4 #####
 
-anova1.2 <- data %>% anova_test(CBCLAVG_4 ~ MRaceT1, type = 3)
-get_anova_table(anova1.2)
-anova2.2 <- data %>% anova_test(AGGAVGT4 ~ MRaceT1, type = 3)
-get_anova_table(anova2.2)
-anova3.2 <- data %>% anova_test(CONF1AVGT4 ~ MRaceT1, type = 3)
-get_anova_table(anova3.2)
-anova4.2 <- data %>% anova_test(CONF2AVGT4 ~ MRaceT1, type = 3)
-get_anova_table(anova4.2)
-anova5.2 <- data %>% anova_test(CONF3AVGT4 ~ MRaceT1, type = 3)
-get_anova_table(anova5.2)
-anova6.2 <- data %>% anova_test(CONF4AVGT4 ~ MRaceT1, type = 3)
-get_anova_table(anova6.2)
 
-# CBCLAVG_4, CONF1AVGT4 significant
+####### ANOVA T4 #########
 
-compare_means(CBCLAVG_4 ~ MRaceT1, data = data, method = "anova", type = 3)
-compare_means(CONF1AVGT4 ~ MRaceT1, data = data, method = "anova", type = 3)
+# CBCLAVG_4
+CBCLAVG4_aov <- aov(CBCLAVG_4 ~ Race,
+                    data = data
+)
+summary(CBCLAVG4_aov)
 
-# CONF1AVGT4 significant 
-
-ggboxplot(data, "Race", "CONF1AVGT4", ylab = "Non-vio disc Avg T4", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+# p < .1, no significant differences
+ggboxplot(data, x = "Race", y = "CBCLAVG_4", ylab = "CBCL Avg T4", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
   scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
   stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 1.5)
 
+
+
+# AGGAVGT4
+AGGAVGT4_aov <- aov(AGGAVGT4 ~ Race,
+                    data = data
+)
+summary(AGGAVGT4_aov)
+
+# p > .05, no significant differences
+ggboxplot(data, x = "Race", y = "AGGAVGT4", ylab = "Agg Avg T4", fill = "Race", color = "Black", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons, label = "p.signif") + stat_compare_means(label.y = 1.5)
+
+
+
+# CONF1AVGT4
+CONF1AVGT4_aov <- aov(CONF1AVGT4 ~ Race,
+                      data = data
+)
+summary(CONF1AVGT4_aov)
+
+# p < .0001
+CONF1AVGT4_phoc <- glht(CONF1AVGT4_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF1AVGT4_phoc)
+plot(CONF1AVGT4_phoc)
+# significant differences: white - black, white - hispanic, hispanic - black
+ggboxplot(data, x = "Race", y = "CONF1AVGT4", ylab = "Non-vio Avg T4", fill = "Race", color = "Black", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF2AVGT4
+CONF2AVGT4_aov <- aov(CONF2AVGT4 ~ Race,
+                      data = data
+)
+summary(CONF2AVGT4_aov)
+
+# p < .0001
+CONF2AVGT4_phoc <- glht(CONF2AVGT4_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF2AVGT4_phoc)
+plot(CONF2AVGT4_phoc)
+# significant differences: white - black, hispanic - black
+ggboxplot(data, "Race", "CONF2AVGT4", ylab = "Psy Agg Avg T4", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF3AVGT4
+CONF3AVGT4_aov <- aov(CONF3AVGT4 ~ Race,
+                      data = data
+)
+summary(CONF3AVGT4_aov)
+
+# p < .0001
+CONF3AVGT4_phoc <- glht(CONF3AVGT4_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF3AVGT4_phoc)
+plot(CONF3AVGT4_phoc)
+# significant differences: white - black, hispanic - black
+ggboxplot(data, "Race", "CONF3AVGT4", ylab = "Phy As Avg T4", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF4AVGT4
+CONF4AVGT4_aov <- aov(CONF4AVGT4 ~ Race,
+                      data = data
+)
+summary(CONF4AVGT4_aov)
+
+# p > .05, no significant differences
+ggboxplot(data, "Race", "CONF4AVGT4", ylab = "Neg Avg T4", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 1.5)
+
+
+#### T4 Means and SDs ####
+
+group_by(data, MRaceT1) %>%
+  summarise(
+    mean = mean(CBCLAVG_4, na.rm = TRUE),
+    sd = sd(CBCLAVG_4, na.rm = TRUE)
+  )
+group_by(data, MRaceT1) %>%
+  summarise(
+    mean = mean(AGGAVGT4, na.rm = TRUE),
+    sd = sd(AGGAVGT4, na.rm = TRUE)
+  )
 group_by(data, MRaceT1) %>%
   summarise(
     mean = mean(CONF1AVGT4, na.rm = TRUE),
     sd = sd(CONF1AVGT4, na.rm = TRUE)
   )
+group_by(data, MRaceT1) %>%
+  summarise(
+    mean = mean(CONF2AVGT4, na.rm = TRUE),
+    sd = sd(CONF2AVGT4, na.rm = TRUE)
+  )
 
+group_by(data, MRaceT1) %>%
+  summarise(
+    mean = mean(CONF3AVGT4, na.rm = TRUE),
+    sd = sd(CONF3AVGT4, na.rm = TRUE)
+  )
 
+group_by(data, MRaceT1) %>%
+  summarise(
+    mean = mean(CONF4AVGT4, na.rm = TRUE),
+    sd = sd(CONF4AVGT4, na.rm = TRUE)
+  )
 
-##### ANOVA T5 #####
-anova1.3 <- data %>% anova_test(CBCLAVG_5 ~ MRaceT1, type = 3)
-get_anova_table(anova1.3)
-anova2.3 <- data %>% anova_test(AGGAVGT5 ~ MRaceT1, type = 3)
-get_anova_table(anova2.3)
-anova3.3 <- data %>% anova_test(CONF1AVGT5 ~ MRaceT1, type = 3)
-get_anova_table(anova3.3)
-anova4.3 <- data %>% anova_test(CONF2AVGT5 ~ MRaceT1, type = 3)
-get_anova_table(anova4.3)
-anova5.3 <- data %>% anova_test(CONF3AVGT5 ~ MRaceT1, type = 3)
-get_anova_table(anova5.3)
-anova6.3 <- data %>% anova_test(CONF4AVGT5 ~ MRaceT1, type = 3)
-get_anova_table(anova6.3)
+####### ANOVA T5 #########
 
-# CBCLAVG_5, AGGAVGT5, CONF1AVGT5,CONF2AVGT5 significant
-
-compare_means(CBCLAVG_5 ~ MRaceT1, data = data, method = "anova", type = 3)
-compare_means(AGGAVGT5 ~ MRaceT1, data = data, method = "anova", type = 3)
-compare_means(CONF1AVGT5 ~ MRaceT1, data = data, method = "anova", type = 3)
-compare_means(CONF2AVGT5 ~ MRaceT1, data = data, method = "anova", type = 3)
-
-# all significant
-
-ggboxplot(data, "Race", "CBCLAVG_5", ylab = "CBCL Avg T5", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+# CBCLAVG_5
+CBCLAVG5_aov <- aov(CBCLAVG_5 ~ Race,
+                    data = data
+)
+summary(CBCLAVG5_aov)
+# p < .05
+CBCLAVG5_phoc <- glht(CBCLAVG5_aov,
+                      linfct = mcp(Race = "Tukey")
+)
+summary(CBCLAVG5_phoc)
+plot(CBCLAVG5_phoc)
+# significant differences: white - hispanic, hispanic - black
+ggboxplot(data, x = "Race", y = "CBCLAVG_5", ylab = "CBCL Avg T5", fill = "Race", color = "Black", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
   scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
   stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 1.5)
-ggboxplot(data, "Race", "AGGAVGT5", ylab = "Agg in Parent Avg T5",  color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+
+
+
+# AGGAVGT5
+AGGAVGT5_aov <- aov(AGGAVGT5 ~ Race,
+                    data = data
+)
+summary(AGGAVGT5_aov)
+#p < .001
+AGGAVGT5_phoc <- glht(AGGAVGT5_aov,
+                      linfct = mcp(Race = "Tukey")
+)
+summary(AGGAVGT5_phoc)
+plot(AGGAVGT5_phoc)
+# significant differences: white - hispanic, hispanic - black
+ggboxplot(data, x = "Race", y = "AGGAVGT5", ylab = "Agg Avg T5", fill = "Race", color = "Black", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
   scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
-  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 2)
-ggboxplot(data, "Race", "CONF1AVGT5", ylab = "Non-vio disc Avg T5", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF1AVGT5
+CONF1AVGT5_aov <- aov(CONF1AVGT5 ~ Race,
+                      data = data
+)
+summary(CONF1AVGT5_aov)
+
+# p < .0001
+CONF1AVGT5_phoc <- glht(CONF1AVGT5_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF1AVGT5_phoc)
+plot(CONF1AVGT5_phoc)
+# significant differences: white - black, white - hispanic, hispanic - black
+ggboxplot(data, x = "Race", y = "CONF1AVGT5", ylab = "Non-vio Avg T5", fill = "Race", color = "Black", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF2AVGT5
+CONF2AVGT5_aov <- aov(CONF2AVGT5 ~ Race,
+                      data = data
+)
+summary(CONF2AVGT5_aov)
+
+# p < .0001
+CONF2AVGT5_phoc <- glht(CONF2AVGT5_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF2AVGT5_phoc)
+plot(CONF2AVGT5_phoc)
+# significant differences: white - black, white - hispanic, hispanic - black
+ggboxplot(data, "Race", "CONF2AVGT5", ylab = "Psy Agg Avg T5", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF3AVGT5
+CONF3AVGT5_aov <- aov(CONF3AVGT5 ~ Race,
+                      data = data
+)
+summary(CONF3AVGT5_aov)
+
+# p < .0001
+CONF3AVGT5_phoc <- glht(CONF3AVGT5_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(CONF3AVGT5_phoc)
+plot(CONF3AVGT5_phoc)
+# significant differences: white - black, hispanic - black
+ggboxplot(data, "Race", "CONF3AVGT5", ylab = "Phy As Avg T5", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+
+# CONF4AVGT4
+CONF4AVGT5_aov <- aov(CONF4AVGT5 ~ Race,
+                      data = data
+)
+summary(CONF4AVGT5_aov)
+
+# p > .05, no significant differences
+ggboxplot(data, "Race", "CONF4AVGT5", ylab = "Neg Avg T5", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
   scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
   stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 1.5)
-ggboxplot(data, "Race", "CONF2AVGT5", ylab = "Pscyh Agg Avg T5", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
-  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
-  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 2)
 
+
+#### T5 Means and SDs ####
 
 group_by(data, MRaceT1) %>%
   summarise(
@@ -181,68 +435,6 @@ group_by(data, MRaceT1) %>%
     sd = sd(CONF2AVGT5, na.rm = TRUE)
   )
 
-## Cultural attachment variables
-
-anova7 <- data %>% anova_test(MCulAttT2 ~ MRaceT1, type = 3)
-get_anova_table(anova7)
-anova8 <- data %>% anova_test(MCulPraT2 ~ MRaceT1, type = 3)
-get_anova_table(anova8)
-
-# MCulPraT2 significant
-
-compare_means(MCulPraT2 ~ MRaceT1, data = data, method = "anova", type = 3)
-
-# MCulPraT2 significant 
-
-ggboxplot(data, "Race", "MCulPraT2", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
-  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
-  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 2)
-
-
-######## Non-significant variables #########
-
-# T3
-
-group_by(data, MRaceT1) %>%
-  summarise(
-    mean = mean(CBCLAVG_3, na.rm = TRUE),
-    sd = sd(CBCLAVG_3, na.rm = TRUE)
-  )
-
-group_by(data, MRaceT1) %>%
-  summarise(
-    mean = mean(AGGAVGT3, na.rm = TRUE),
-    sd = sd(AGGAVGT3, na.rm = TRUE)
-  )
-
-# T4
-
-group_by(data, MRaceT1) %>%
-  summarise(
-    mean = mean(AGGAVGT4, na.rm = TRUE),
-    sd = sd(AGGAVGT4, na.rm = TRUE)
-  )
-
-group_by(data, MRaceT1) %>%
-  summarise(
-    mean = mean(CONF2AVGT4, na.rm = TRUE),
-    sd = sd(CONF2AVGT4, na.rm = TRUE)
-  )
-
-group_by(data, MRaceT1) %>%
-  summarise(
-    mean = mean(CONF3AVGT4, na.rm = TRUE),
-    sd = sd(CONF3AVGT4, na.rm = TRUE)
-  )
-
-group_by(data, MRaceT1) %>%
-  summarise(
-    mean = mean(CONF4AVGT4, na.rm = TRUE),
-    sd = sd(CONF4AVGT4, na.rm = TRUE)
-  )
-
-# T5
-
 group_by(data, MRaceT1) %>%
   summarise(
     mean = mean(CONF3AVGT5, na.rm = TRUE),
@@ -255,11 +447,54 @@ group_by(data, MRaceT1) %>%
     sd = sd(CONF4AVGT5, na.rm = TRUE)
   )
 
-# Cultural attachment
+
+
+#### Anova Cultural attachment variables ###
+
+# MCulAttT2
+MCulAttT2_aov <- aov(MCulAttT2 ~ Race,
+                      data = data
+)
+summary(MCulAttT2_aov)
+# p < .05
+MCulAttT2_phoc <- glht(MCulAttT2_aov,
+                        linfct = mcp(Race = "Tukey")
+)
+summary(MCulAttT2_phoc)
+plot(MCulAttT2_phoc)
+# significant differences: white - black
+ggboxplot(data, "Race", "MCulAttT2", ylab = "Cultural Attachment", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
+# MCulPraT2
+MCulPraT2_aov <- aov(MCulPraT2 ~ Race,
+                     data = data
+)
+summary(MCulPraT2_aov)
+# p < .05
+MCulPraT2_phoc <- glht(MCulPraT2_aov,
+                       linfct = mcp(Race = "Tukey")
+)
+summary(MCulPraT2_phoc)
+plot(MCulPraT2_phoc)
+# significant differences: white - black, white - hispanic, black - hispanic
+ggboxplot(data, "Race", "MCulPraT2", ylab = "Cultural Practice", color = "Black", fill = "Race", palette = c("#4059AD", "#6B9AC4", "#97D8CA")) + 
+  scale_x_discrete(labels = c("White", "Black", "Hispanic")) + 
+  stat_compare_means(comparisons = comparisons) + stat_compare_means(label.y = 3)
+
+
 
 group_by(data, MRaceT1) %>%
   summarise(
     mean = mean(MCulAttT2, na.rm = TRUE),
     sd = sd(MCulAttT2, na.rm = TRUE)
+  )
+
+group_by(data, MRaceT1) %>%
+  summarise(
+    mean = mean(MCulPraT2, na.rm = TRUE),
+    sd = sd(MCulPraT2, na.rm = TRUE)
   )
 
